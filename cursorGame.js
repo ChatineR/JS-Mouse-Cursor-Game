@@ -1,13 +1,27 @@
 var gamePiece;
-var wall = [];
+var wall;
 var score;
+var enterKey = function(event){
+if(event.keyCode == 13) {
+  clearInterval(this.interval);
+  startGame();
+    }
+  }
 
 function startGame() {
   gameArea.start();
+  wall = [];
+
+  document.body.removeEventListener("keyup", enterKey, true);
+
   score = new component("30px", "Consolas", "white", 10, 30, "text");
   gamePiece = new component(16, 16, "orange", 10, 120);
   endText = new component("60px","Consolas", "red", innerWidth/2, innerHeight/2, "text");
   newGameText = new component("40px", "Consolas", "white", innerWidth/2, innerHeight/2 + 100 , "text");
+
+  if (this.interval == null) {
+    this.interval = setInterval(updateGameArea, 1000/144);
+  }
 }
 
 var gameArea = {
@@ -19,7 +33,7 @@ var gameArea = {
     this.context = this.canvas.getContext("2d");
     document.body.insertBefore(this.canvas, document.body.childNodes[0]);
     this.frameNo = 0;
-    this.interval = setInterval(updateGameArea, 1000/144);
+
     window.addEventListener('mousemove', function (e) {
       gameArea.x = e.pageX;
       gameArea.y = e.pageY;
@@ -29,7 +43,6 @@ var gameArea = {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   },
   stop : function() {
-    clearInterval(this.interval);
     this.canvas.style.cursor = "default";
 
     this.context = this.canvas.getContext("2d");
@@ -45,6 +58,9 @@ var gameArea = {
 
     newGameText.text="press 'ENTER' to start a new game!";
     newGameText.update();
+
+  document.body.addEventListener("keyup", enterKey, true);
+
   }
 }
 
@@ -97,13 +113,6 @@ function updateGameArea() {
   for (i = 0; i < wall.length; i += 1) {
       if (gamePiece.crashWith(wall[i])) {
           gameArea.stop();
-
-          document.body.addEventListener("keyup", function(event){
-      	  if(event.keyCode == 13) {
-            clearInterval(this.interval);
-            startGame();
-      	}
-      });
           return;
       }
     }
@@ -136,6 +145,7 @@ function updateGameArea() {
     score.update();
     gamePiece.newPos();
     gamePiece.update();
+
   }
 
 function everyInterval(n) {
